@@ -1,0 +1,359 @@
+/* The five screens.
+
+   Tokens only below this line — no literal color, size or timing — so the design
+   system reaches this app through one file. The one exception is the chart fills,
+   which live in `viz.ts` because they are validated values with reasoning attached
+   rather than style choices, and a CSS variable would hide that. */
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* `flex-wrap` and the narrow-screen padding below matter under about 394px, where
+   the nav could not fit beside the wordmark, so the document grew wider than the
+   viewport: every screen scrolled sideways, and because the bar was only as wide as the
+   VIEWPORT while the page was wider, a white stripe ran down the right of the dark
+   header for the full height of the page. The data tables were never the cause — those
+   scroll correctly inside their own containers. */
+.shell__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--s-6);
+  background: var(--bg-dark);
+  color: var(--fg-on-dark);
+  /* The sunset line under the charcoal sky — the one place the display orange runs
+     edge to edge. Decoration, not text, so no contrast floor applies to it. */
+  border-bottom: 3px solid var(--bz-orange);
+  box-shadow: var(--shadow-sm);
+}
+
+/* The wordmark is set in the heading face, not an image: one string at one weight
+   does not need a network request or a logo asset in the wheel. */
+/* The lockup, sized by height so the bar's rhythm sets it rather than a pixel width.
+   `width: auto` keeps the aspect ratio: the brand rules forbid stretching it. */
+.shell__mark {
+  height: 1.75rem;
+  width: auto;
+  display: block;
+}
+
+.shell__bar .label {
+  color: var(--fg-on-dark-mut);
+}
+
+.shell__main {
+  flex: 1;
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--s-7) var(--s-6);
+}
+
+/* --- notices ------------------------------------------------------------- */
+.notice {
+  max-width: 40rem;
+  margin: var(--s-8) auto;
+  padding: var(--s-6);
+  background: var(--bg-soft);
+  border-radius: var(--r-lg);
+}
+
+.notice h1,
+.notice h2 {
+  margin-bottom: var(--s-3);
+}
+
+.notice p + p {
+  margin-top: var(--s-3);
+}
+
+/* Orange marks what needs action and nothing else — a left rule rather than an
+   orange panel, because the message is the thing to read, not the color. */
+.notice--problem {
+  background: var(--bg-page);
+  border-left: 3px solid var(--border-accent);
+  border-radius: 0 var(--r-lg) var(--r-lg) 0;
+}
+
+.notice code {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  background: var(--bg-page);
+  padding: 0 var(--s-1);
+  border-radius: var(--r-xs);
+}
+
+/* --- navigation ---------------------------------------------------------- */
+.nav { display: flex; gap: var(--s-5); margin-left: auto; }
+
+/* Below this the nav takes its own line rather than forcing the page wider than the
+   screen. `margin-left: 0` so it starts at the left edge instead of hanging off the
+   right once it is no longer sharing a row with the wordmark. */
+@media (max-width: 30rem) {
+  .shell__bar { padding-inline: var(--s-4); }
+  .nav { margin-left: 0; width: 100%; gap: var(--s-4); }
+}
+
+.nav__link {
+  color: var(--fg-on-dark-mut);
+  text-decoration: none;
+  font-size: var(--fs-body-sm);
+  padding-bottom: var(--s-1);
+  border-bottom: 2px solid transparent;
+  transition: color var(--t-fast) var(--ease-out);
+}
+.nav__link:hover { color: var(--fg-on-dark); }
+/* The current screen is marked by weight and a MARIGOLD rule. Marigold is the
+   fill-only warm — never the action orange, so "where you are standing" still cannot
+   be mistaken for an alarm — and it clears the 3:1 non-text floor against the
+   charcoal bar at 4.4:1. */
+.nav__link--current { color: var(--fg-on-dark); border-bottom-color: var(--bz-marigold); font-weight: 600; }
+
+.crumb { margin: 0 0 var(--s-4); font-size: var(--fs-body-sm); }
+.crumb a { color: var(--fg-interactive); text-decoration: none; }
+.crumb a:hover { text-decoration: underline; }
+
+.lede { max-width: 46rem; margin: var(--s-3) 0 var(--s-5); }
+.note { font-size: var(--fs-body-sm); }
+.section { margin: var(--s-7) 0 var(--s-4); }
+
+/* --- stat tiles ---------------------------------------------------------- */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--s-4);
+  margin: var(--s-5) 0 var(--s-7);
+}
+.tiles--tight { margin-bottom: var(--s-5); }
+
+.tile {
+  padding: var(--s-4) var(--s-5);
+  /* A hint of dawn at the foot of each tile. The gradient stays above 1.05:1 of
+     white, so nothing that sits on it loses meaningful contrast. */
+  background: linear-gradient(180deg, var(--bg-page), var(--bz-dawn));
+  border: 1px solid #E8E4DA;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+}
+.tile__value {
+  margin: var(--s-2) 0 0;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--fs-h1);
+  line-height: 1;
+  /* Display orange: the four figures are the loudest thing on the screen, which is
+     the full-sunset treatment's whole point. 28px/700 is large text, where the
+     3.9:1 the display orange reaches IS the AA floor (3:1). Never reuse this color
+     at body sizes — that is what --fg-interactive exists for. */
+  color: var(--fg-accent);
+  /* Proportional, not tabular: equal-width digits make a large standalone number
+     look loose, and nothing here lines up in a column. */
+  font-variant-numeric: proportional-nums;
+}
+/* A block, because it now lives inside the <dd> (a sibling <p> made the <dl>
+   invalid) and still has to sit on its own line under the figure. */
+.tile__note { display: block; margin: var(--s-2) 0 0; font-size: var(--fs-body-sm); font-weight: 400; }
+
+/* --- charts -------------------------------------------------------------- */
+.split { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: var(--s-6); }
+.chart { margin: 0 0 var(--s-6); }
+.chart figcaption { margin-bottom: var(--s-3); }
+
+.legend {
+  display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4);
+  list-style: none; margin: var(--s-3) 0 0; padding: 0;
+  font-size: var(--fs-body-sm);
+}
+.legend li { display: flex; align-items: center; gap: var(--s-2); }
+.legend__swatch { width: 12px; height: 12px; border-radius: var(--r-xs); display: inline-block; }
+.legend--scale { align-items: center; gap: var(--s-1); }
+.legend--scale .legend__swatch { border-radius: 0; }
+.legend--scale li:first-child, .legend--scale .legend__gap { margin-inline: var(--s-2); }
+.legend__swatch--noevent { background: var(--bg-soft); border: 1px solid var(--border-medium); }
+/* The month still running. Dashed rather than a third fill: it is
+   the same absence of an answer as --noevent, for a different reason, and a new solid
+   colour would read as a new value on the ramp. */
+.legend__swatch--inprogress { background: var(--bg-soft); border: 1px dashed var(--border-medium); }
+
+/* the stacked lifecycle bar */
+.stack { display: flex; height: 2.5rem; border-radius: var(--r-sm); overflow: hidden; }
+/* A 2px gap of page between fills rather than a border drawn around each — a border
+   adds a line the data does not have. */
+.stack__seg + .stack__seg { margin-left: 2px; }
+.stack__seg { display: flex; align-items: center; justify-content: center; min-width: 2px; }
+.stack__value { font-size: var(--fs-body-sm); font-weight: 600; }
+
+/* turnout bars */
+.bars { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+.bars__row { display: grid; grid-template-columns: minmax(6rem, 12rem) 1fr auto; gap: var(--s-3); align-items: center; }
+.bars__name { font-size: var(--fs-body-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bars__track { display: flex; height: 1.25rem; }
+.bars__seg { display: block; border-radius: var(--r-xs); }
+.bars__seg + .bars__seg { margin-left: 2px; }
+.bars__total { font-size: var(--fs-body-sm); font-weight: 600; min-width: 2ch; text-align: right; }
+
+/* retention grid */
+.grid__scroll { overflow-x: auto; }
+/* `width: auto` against the global `table { width: 100% }`. Stretched, the row labels
+   and Month 0 end up at opposite ends of the page with dead space between them, and
+   the grid stops reading as one object. */
+.grid { width: auto; border-collapse: separate; border-spacing: 2px; font-size: var(--fs-body-sm); }
+.grid th { font-weight: 600; text-align: left; white-space: nowrap; padding-right: var(--s-3); }
+.grid__offset { color: var(--fg-muted); font-weight: 500; }
+.grid__cell { width: 3.5rem; text-align: center; padding: var(--s-2) var(--s-1); border-radius: var(--r-xs); }
+/* The two blanks are drawn differently from each other on purpose. A month with no
+   event carries a mark, because that cell IS answering; a month that has not arrived
+   is nothing at all. */
+.grid__cell--noevent { background: var(--bg-soft); color: var(--fg-muted); }
+.grid__cell--inprogress { background: var(--bg-soft); color: var(--fg-muted); border: 1px dashed var(--border-medium); }
+.grid__cell--future { background: transparent; }
+
+/* the table twin every chart carries */
+/* What a column cannot say in its header. Sits under the figure rather than in a
+   tooltip alone: these counts read as more precise than the export behind them, and a
+   caveat nobody hovers is not a caveat. */
+.figure__note {
+  margin: var(--s-4) 0 0;
+  max-width: 46rem;
+  font-size: var(--fs-body-sm);
+  color: var(--fg-muted);
+}
+
+.twin { margin-top: var(--s-4); font-size: var(--fs-body-sm); }
+.twin summary { color: var(--fg-muted); cursor: pointer; }
+.twin summary:hover { color: var(--fg-default); }
+.twin__scroll { overflow-x: auto; margin-top: var(--s-3); }
+
+/* --- tables -------------------------------------------------------------- */
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: var(--s-2) var(--s-3); }
+thead th {
+  font-size: var(--fs-label); text-transform: uppercase;
+  letter-spacing: var(--tr-label); color: var(--fg-muted); font-weight: 700;
+}
+tbody tr { border-top: 1px solid var(--border-soft); }
+.roster tbody tr:hover { background: var(--bg-soft); }
+.roster th[scope='row'] { font-weight: 500; }
+.roster__email { display: block; font-size: var(--fs-body-sm); }
+/* Charcoal, not the interactive orange. Every row here is a link, so orange would paint
+   the whole name column — and orange means "needs action", which nobody's name does. But
+   hover-only was tried and the person screen went undiscovered: at rest the roster
+   read as a static table, and nothing invited the click. So the underline is always
+   on, in a quiet ink, and only takes the interactive color under the pointer. */
+.roster a {
+  color: var(--fg-default);
+  text-decoration: underline;
+  text-decoration-color: var(--border-medium);
+  text-underline-offset: 3px;
+}
+.roster a:hover { text-decoration-color: var(--fg-interactive); }
+
+.sorter {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit;
+  display: inline-flex; gap: var(--s-1); align-items: center;
+}
+.sorter:hover { color: var(--fg-default); }
+.sorter__mark { width: 1ch; }
+
+.chip {
+  display: inline-block;
+  padding: 2px var(--s-2);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.toolbar { display: flex; align-items: end; gap: var(--s-4); margin-bottom: var(--s-4); }
+
+/* --- one person ---------------------------------------------------------- */
+.person { display: flex; align-items: center; gap: var(--s-3); }
+
+.timeline { list-style: none; margin: 0; padding: 0; }
+.timeline__row {
+  display: grid;
+  grid-template-columns: 9rem 1fr auto;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-top: 1px solid var(--border-soft);
+  align-items: baseline;
+}
+.timeline__when, .timeline__status { font-size: var(--fs-body-sm); }
+/* The two rows worth noticing. A no-show is the one an organizer can act on, so it
+   takes the accent rule; an event they ignored recedes but is still drawn, because
+   its absence from the list is exactly what would hide the pattern. */
+.timeline__row--no_show { border-left: 3px solid var(--border-accent); padding-left: var(--s-3); }
+.timeline__row--absent { color: var(--fg-muted); }
+
+/* --- first run ----------------------------------------------------------- */
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: var(--s-5); }
+.panel {
+  padding: var(--s-5);
+  background: var(--bg-page);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-xs);
+}
+.panel h2 { margin-bottom: var(--s-2); }
+.panel p { font-size: var(--fs-body-sm); }
+
+.field { display: block; margin: var(--s-4) 0 var(--s-3); }
+.field--inline { margin: 0; }
+.field input {
+  display: block; width: 100%; margin-top: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  font: inherit; font-size: var(--fs-body-sm);
+  color: var(--fg-default);
+  background: var(--bg-page);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--r-sm);
+}
+.field input:focus-visible { outline: 2px solid var(--fg-interactive); outline-offset: 1px; }
+
+.button {
+  font-family: var(--font-heading); font-size: var(--fs-body-sm); font-weight: 600;
+  padding: var(--s-2) var(--s-4);
+  color: var(--fg-on-dark);
+  /* The interactive orange, not the display orange: #C4693F fails AA for white
+     text at this size, the same trade the parent brand makes with its red. */
+  background: var(--fg-interactive);
+  border: 0; border-radius: var(--r-sm); cursor: pointer;
+  transition: background var(--t-fast) var(--ease-out);
+}
+.button:hover:not(:disabled) { background: var(--bz-orange-hover); }
+.button:disabled { background: var(--fg-muted); cursor: not-allowed; }
+.button--quiet { background: var(--bg-dark); }
+.button--quiet:hover:not(:disabled) { background: var(--bg-darker); }
+
+.report { margin-top: var(--s-6); }
+.warnings { margin: var(--s-2) 0 0; padding-left: var(--s-5); font-size: var(--fs-body-sm); }
+
+.pending { margin-top: var(--s-5); }
+.pending__row { padding: var(--s-4) 0; border-top: 1px solid var(--border-soft); }
+.pending__id { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: baseline; font-size: var(--fs-body-sm); }
+.pending__form { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-3); }
+.pending__form input {
+  padding: var(--s-2) var(--s-3); font: inherit; font-size: var(--fs-body-sm);
+  border: 1px solid var(--border-medium); border-radius: var(--r-sm);
+}
+.saved { margin: var(--s-2) 0 0; font-size: var(--fs-body-sm); color: var(--tr-success); }
+.problem { margin: var(--s-2) 0 0; font-size: var(--fs-body-sm); color: var(--fg-interactive); }
+
+/* Settings: one column of labelled numbers. The unit sits beside the input because
+   "90" is not an answer to anything — "90 days" is. */
+.settings { max-width: 34rem; }
+.settings__field { padding: var(--s-3) 0; border-top: 1px solid var(--border-soft); }
+.settings__field:first-of-type { border-top: 0; }
+.settings__control { display: flex; align-items: center; gap: var(--s-3); margin-top: var(--s-1); }
+.settings__control input {
+  width: 6rem; padding: var(--s-2) var(--s-3); font: inherit;
+  border: 1px solid var(--border-medium); border-radius: var(--r-sm);
+}
+.settings__control input:focus-visible { outline: 2px solid var(--fg-interactive); outline-offset: 1px; }
+.settings__hint { display: block; margin-top: var(--s-1); font-size: var(--fs-body-sm); }
+.settings__actions { display: flex; align-items: center; gap: var(--s-4); margin-top: var(--s-4); }

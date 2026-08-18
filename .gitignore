@@ -1,0 +1,18 @@
+# The compiled front end is built at release, not committed: build output in git can
+# disagree with the source it was built from, and a stale bundle is invisible.
+# `baraza.web.ui` serves an explanation when it is absent, which is the normal state of a
+# fresh checkout.
+src/baraza/web/static/
+
+# Build artifacts and local state.
+dist/
+*.egg-info/
+node_modules/
+__pycache__/
+*.py[cod]
+
+# An organizer's store and their credentials. Never in a repository — the first holds
+# attendees' names and email addresses, the other two are secrets.
+*.db
+*.db.token
+*.db.luma-key
