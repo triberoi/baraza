@@ -1,0 +1,75 @@
+{
+  "note": "Shared vectors for turning a rate into a whole percentage. Read by tests/test_cli.py and ui/src/viz.test.ts. The rule is HALF-UP: floor(x * 100 + 0.5), which is what JavaScript's Math.round already does and what Python's round() does NOT - round() is banker's rounding, so round(12.5) is 12. Both languages compute this on IEEE doubles, so even the cases where a float is not exactly the half it looks like must come out the same. One file rather than two sets of expectations: a test comparing against a hardcoded string cannot catch a divergence between them.",
+  "vectors": [
+    {
+      "rate": 0.0,
+      "percent": 0,
+      "why": "zero"
+    },
+    {
+      "rate": 1.0,
+      "percent": 100,
+      "why": "everyone"
+    },
+    {
+      "rate": 0.125,
+      "percent": 13,
+      "why": "12.5% - THE case: Python's round() gives 12, JS Math.round gives 13"
+    },
+    {
+      "rate": 0.005,
+      "percent": 1,
+      "why": "0.5% - a half at the bottom of the range; round() would give 0"
+    },
+    {
+      "rate": 0.995,
+      "percent": 100,
+      "why": "99.5% - a half at the top, which half-up carries to 100"
+    },
+    {
+      "rate": 0.225,
+      "percent": 23,
+      "why": "22.5% - round() gives 22 (2 is even), half-up gives 23"
+    },
+    {
+      "rate": 0.375,
+      "percent": 38,
+      "why": "37.5% - round() gives 38 here, so the two rules AGREE; a control"
+    },
+    {
+      "rate": 0.625,
+      "percent": 63,
+      "why": "62.5% - round() gives 62, half-up gives 63"
+    },
+    {
+      "rate": 0.875,
+      "percent": 88,
+      "why": "87.5% - round() gives 88, so the two agree again; the second control"
+    },
+    {
+      "rate": 0.3333333333333333,
+      "percent": 33,
+      "why": "a third - no half anywhere near it"
+    },
+    {
+      "rate": 0.6666666666666666,
+      "percent": 67,
+      "why": "two thirds - rounds up on both rules"
+    },
+    {
+      "rate": 0.1449,
+      "percent": 14,
+      "why": "just under the .5 boundary at 14.49% - down on both"
+    },
+    {
+      "rate": 0.1451,
+      "percent": 15,
+      "why": "just over it at 14.51% - up on both"
+    },
+    {
+      "rate": 0.115,
+      "percent": 12,
+      "why": "11.5% as a float is 11.500000000000002, not 11.5 - the languages must still agree"
+    }
+  ]
+}

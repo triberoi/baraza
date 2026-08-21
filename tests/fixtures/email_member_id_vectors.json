@@ -1,0 +1,55 @@
+{
+  "note": "Shared vectors for the deterministic member id (FNV-1a 32-bit over Unicode CODE POINTS). Read by tests/test_mappers.py and by the TypeScript that must agree with it. These ids are PERSISTED and joined on, so a changed value here is a data migration, not a test edit.",
+  "vectors": [
+    {
+      "email": "",
+      "memberId": "mem_811c9dc5",
+      "why": "the empty string — the FNV offset basis, unmixed"
+    },
+    {
+      "email": "alice@x.com",
+      "memberId": "mem_9423cf68",
+      "why": "plain ASCII"
+    },
+    {
+      "email": "  Alice@X.COM ",
+      "memberId": "mem_9423cf68",
+      "why": "trim + lowercase happen before hashing"
+    },
+    {
+      "email": "bob@example.org",
+      "memberId": "mem_7079c96a",
+      "why": "a second ASCII address, to pin that ids differ"
+    },
+    {
+      "email": "a@b.c",
+      "memberId": "mem_f54879b5",
+      "why": "shortest realistic address"
+    },
+    {
+      "email": "renee.o@exemple.fr",
+      "memberId": "mem_8838c775",
+      "why": "accented Latin — BMP, where the two languages always agreed"
+    },
+    {
+      "email": "张伟@example.cn",
+      "memberId": "mem_06becae5",
+      "why": "CJK — BMP"
+    },
+    {
+      "email": "😀@example.com",
+      "memberId": "mem_be2662be",
+      "why": "ASTRAL: U+1F600. One code point in Python, a surrogate PAIR in UTF-16 — the only class that has ever diverged between the two"
+    },
+    {
+      "email": "👩‍💻@dev.io",
+      "memberId": "mem_7fa7895b",
+      "why": "ASTRAL + ZWJ sequence: two astral code points either side of a BMP joiner"
+    },
+    {
+      "email": "𠀀@example.jp",
+      "memberId": "mem_ae7091d7",
+      "why": "ASTRAL: CJK Extension B, U+20000 — a non-emoji astral case"
+    }
+  ]
+}

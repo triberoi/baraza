@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- The roster is personal data and this page is the only thing that ever holds
+         the session token. `no-referrer` stops the token reaching any third party if a
+         link is ever added, and the page loads nothing from off the machine anyway. -->
+    <meta name="referrer" content="no-referrer" />
+    <!-- Served from `public/`, so it is a file in the wheel rather than a request off
+         the machine. Drawn at 32px rather than scaled from the logo: below 24px the
+         seat line and the plinth merge. -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>baraza</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

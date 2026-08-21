@@ -1,0 +1,162 @@
+/* =============================================================
+   The baraza design system: the parent brand's bones, baraza's own accent layer.
+
+   baraza keeps the parent system's structure — charcoal ink, white page, the
+   three brand faces, the 8pt grid, cool-navy shadows — so the two products
+   read as family. What it swaps is the ACCENT layer, drawn from a South
+   African safari print: olive fabric, petrol-blue ink, a two-tone sunset.
+   The print's petrol ink is within a shade of the shared charcoal; that
+   common ink is what makes the swap read as a sibling rather than a fork.
+   Decision 2026-08-16: orange takes the action role and baraza has no red;
+   supporting text is olive, at AA, which the gray it replaces was not
+   (2.36:1 on white).
+
+   Three deliberate differences from the parent system's stylesheet, each
+   for a reason that only applies here:
+
+   1. **No Google Fonts @import.** The source pulls three families from
+      fonts.googleapis.com. A tool an organizer runs on their own laptop must
+      not phone a third party on every load — it breaks on a plane, and it
+      tells Google who is using this. The same OFL fonts arrive through
+      @fontsource and are bundled into the wheel (see main.tsx).
+
+   2. **Marketing type is dropped.** The display scale, eyebrow and stat
+      classes belong to a landing page. This is an application: it has tables,
+      not hero copy. What is kept is what a dense screen needs.
+
+   3. **Single light theme, on purpose.** The system has dark panels inside a
+      light page, not a dark palette. Inventing a dark mode here would be
+      inventing brand.
+   ============================================================= */
+
+:root {
+  /* ---------- Brand colors ---------- */
+  --bz-orange:       #C4693F;  /* Display accent. 3.9:1 for white text — display sizes only. */
+  --bz-orange-hover: #8F421F;
+  /* #C4693F fails WCAG AA for white text at button and body sizes, the same
+     way the parent brand's display accent does. Buttons, links and small
+     accents take this darkened variant (white text 5.5:1) — in a product UI
+     almost every orange is this one. */
+  --bz-orange-interactive: #A84F2A;
+  --bz-marigold:   #E89A3F;   /* Fill-only: a warm mark, never text (2.3:1). */
+  --bz-charcoal:   #30435B;   /* The shared ink: text, headings, dark panels. */
+  --bz-navy:       #0F1B2D;
+  --bz-olive-text: #55654F;   /* Supporting text. 6.3:1 on white — AA. */
+  --bz-label:      #8A5A2B;   /* Uppercase labels: warm ochre, 5.9:1 on white — AA. */
+  --bz-olive:      #6A7A64;   /* Chips, borders, context marks. 4.6:1 on white. */
+  --bz-sage:       #EFF2EC;   /* Soft panels, alternating rows. */
+  --bz-dawn:       #FBF3E7;   /* The warm foot of the stat-tile gradient. A ground,
+                                 never a data step — same rule as sage. */
+  --bz-white:      #FFFFFF;
+
+  /* ---------- Status ---------- */
+  --tr-success: #047857;
+  --tr-warning: #B45309;
+  --tr-info:    #1D4ED8;
+
+  /* ---------- Surfaces ---------- */
+  --bg-page:   var(--bz-white);
+  --bg-soft:   var(--bz-sage);
+  --bg-dark:   var(--bz-charcoal);
+  --bg-darker: var(--bz-navy);
+
+  /* ---------- Foreground ---------- */
+  --fg-default:     var(--bz-charcoal);
+  --fg-muted:       var(--bz-olive-text);
+  --fg-on-dark:     var(--bz-white);
+  --fg-on-dark-mut: var(--bz-sage);
+  --fg-accent:      var(--bz-orange);
+  --fg-interactive: var(--bz-orange-interactive);
+  /* The label ochre is its own role, not muted text: labels are the small warm
+     signposts of the full-sunset treatment, and folding them into --fg-muted would
+     drag every caption and legend warm with them. */
+  --fg-label:       var(--bz-label);
+
+  /* ---------- Strokes ---------- */
+  --border-soft:   var(--bz-sage);
+  --border-medium: #D9DFD4;
+  --border-accent: var(--bz-orange);
+
+  /* ---------- Chart data layers ----------
+     Charcoal is the baseline, olive is context, and orange marks only what
+     needs action. The lifecycle ramp is ordinal — first_timer → regular →
+     champion is an order, so it is one hue getting stronger, not three hues. */
+  --chart-highlight: var(--bz-orange);
+  --chart-baseline:  var(--bz-charcoal);
+  --chart-context:   var(--bz-olive);
+  --chart-soft:      var(--bz-sage);
+
+  /* ---------- Type ---------- */
+  --font-heading: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body:    'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --fs-h1:      1.75rem;   /* 28 — a screen title, not a hero */
+  --fs-h2:      1.375rem;  /* 22 */
+  --fs-h3:      1.125rem;  /* 18 */
+  --fs-body:    1rem;      /* 16 */
+  --fs-body-sm: 0.875rem;  /* 14 */
+  --fs-label:   0.75rem;   /* 12 */
+  --fs-mono:    0.875rem;
+
+  --lh-snug: 1.15;
+  --lh-body: 1.55;
+  --tr-heading: -0.01em;
+  --tr-label:   0.08em;
+
+  /* ---------- Spacing (8pt grid) ---------- */
+  --s-1: 0.25rem; --s-2: 0.5rem;  --s-3: 0.75rem; --s-4: 1rem;
+  --s-5: 1.5rem;  --s-6: 2rem;    --s-7: 3rem;    --s-8: 4rem;
+
+  /* ---------- Radius ---------- */
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-pill: 999px;
+
+  /* ---------- Elevation ---------- */
+  --shadow-xs: 0 1px 2px rgba(15, 27, 45, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 27, 45, 0.06), 0 1px 2px rgba(15, 27, 45, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 27, 45, 0.08), 0 2px 4px rgba(15, 27, 45, 0.04);
+
+  /* ---------- Motion ---------- */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --t-fast: 120ms;
+  --t-base: 200ms;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--fg-default);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  letter-spacing: var(--tr-heading);
+  line-height: var(--lh-snug);
+  margin: 0;
+}
+h1 { font-size: var(--fs-h1); font-weight: 700; }
+h2 { font-size: var(--fs-h2); font-weight: 700; }
+h3 { font-size: var(--fs-h3); font-weight: 600; }
+
+/* Every number in this app sits in a column beside another number. Tabular
+   figures are not a flourish here — proportional digits make a roster jitter. */
+.tabular, td, th { font-variant-numeric: tabular-nums lining-nums; }
+
+.muted { color: var(--fg-muted); }
+.mono  { font-family: var(--font-mono); font-size: var(--fs-mono); }
+
+.label {
+  font-family: var(--font-heading);
+  font-size: var(--fs-label);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tr-label);
+  color: var(--fg-label);
+}

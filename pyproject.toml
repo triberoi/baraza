@@ -1,0 +1,128 @@
+# baraza — attendance analytics for Luma calendars.
+#
+# The dependencies below are the whole list. Adding one is a decision about every
+# organizer who installs this, so keep it short and keep it pure Python where you can.
+
+[project]
+name = "baraza"
+version = "0.2.0"
+description = "Attendance analytics for Luma calendars"
+readme = "README.md"
+# 3.11, not 3.10: `from datetime import UTC` is 3.11+. A floor nobody executes is only a
+# string, and a wrong one cannot be withdrawn once it is on PyPI — so `python_version`
+# below holds mypy to it and the CI matrix runs the suite on it.
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "TribeROI Inc." }]
+keywords = ["luma", "events", "community", "attendance", "analytics"]
+classifiers = [
+    # Feature-complete, with unit tests, a browser walk and a security review behind it —
+    # but nobody outside the project has run it yet, and the MCP surface has never been
+    # driven by a real client. That is what Beta means here.
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Office/Business",
+]
+dependencies = [
+    "httpx>=0.27",
+    # `baraza serve` is the front door, not an optional extra — an organizer who installs
+    # the package and cannot run the app has not installed it.
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+]
+
+[project.scripts]
+baraza = "baraza.cli:main"
+
+[project.optional-dependencies]
+# The MCP server is a demo surface, not the front door, and `mcp` pulls
+# pyjwt[crypto] -> cryptography, a Rust build. Wheels exist everywhere mainstream, but it
+# is real weight in the default install of a tool that otherwise needs only Python.
+mcp = [
+    # Pinned below 2.0: `mcp` 2.0 renamed `mcp.server.fastmcp` out of existence, so an
+    # unbounded range resolves to a release without the module the shim imports — and the
+    # shim's ImportError handler then tells someone who just installed the extra to
+    # install the extra. Porting to the 2.0 API is a rewrite; do it on evidence.
+    "mcp>=1.12,<2",
+]
+# The browser walk. Its own extra rather than part of `dev`, because it pulls Playwright
+# and then a ~130MB browser binary that a contributor running the unit tests should not
+# pay for. The `walkthrough` CI job installs it; nothing else does.
+walkthrough = [
+    # `pytest-playwright` is what supplies the `page` fixture and the `--headed`/`--slowmo`
+    # flags the README promises; `playwright` alone gives neither.
+    "pytest-playwright>=0.5",
+    "pytest>=8.2",
+]
+dev = [
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "pytest>=8.2",
+    # Here too, so the MCP shim is exercised rather than skipped — a silently absent extra
+    # sends those tests back to skipping, and a skip absorbed into a pass count reads as
+    # coverage. The workflow asserts the install rather than assuming it.
+    #
+    # The `<2` bound must match the `mcp` extra above, or CI exercises a version no
+    # organizer can install.
+    "mcp>=1.12,<2",
+]
+
+[project.urls]
+Homepage = "https://github.com/triberoi/baraza"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# `artifacts` sits on the SHARED build table, not on the wheel target, so it applies to the
+# sdist too. `python -m build` makes an sdist and then builds the wheel FROM it, so anything
+# the sdist drops is missing from the wheel however the wheel target is configured. Declared
+# on the wheel alone, a direct `--wheel` build looked correct and the real one shipped an API
+# with no interface.
+[tool.hatch.build]
+# `py.typed` (PEP 561) is what lets a consumer's strict mypy see these annotations rather
+# than treating the whole package as untyped.
+artifacts = [
+    "src/baraza/py.typed",
+    # The compiled front end. `web/static/` is GITIGNORED — assets are built at
+    # release, not committed — and hatchling excludes gitignored paths by default,
+    # so without this line the wheel ships an API with no interface. It builds
+    # green and the organizer gets a 503 explaining a fault they cannot fix.
+    #
+    # `**`, not `**/*`. The latter requires a directory level and so matches nothing
+    # at the top of `static/` — where `index.html` is. The whole tree went missing,
+    # not just that one file, and nothing noticed until the wheel was inspected.
+    "src/baraza/web/static/**",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/baraza"]
+
+[tool.ruff]
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+# The DECLARED floor, never the developer's interpreter: checking against a newer version
+# than `requires-python` promises is how a too-new import ships as compatible. Keep this
+# equal to `requires-python` above — the pair is the enforcement.
+python_version = "3.11"
+strict = true
+files = ["src"]
+
+# `mcp` is an optional extra, so it is legitimately absent in some environments — a
+# developer on a platform with no `cryptography` wheel, or anyone who installed the
+# core package. `ignore_missing_imports` only applies when it IS missing; where the
+# extra is installed (CI), mypy still checks the call against the real package.
+[[tool.mypy.overrides]]
+module = ["mcp.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
